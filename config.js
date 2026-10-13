@@ -3,5 +3,5 @@
 window.FREEMAN_CONFIG = {
   supabaseUrl: "https://jnpgcbkrttepdtposvhp.supabase.co",
   supabaseAnonKey: "sb_publishable_efC3_2RXEMdFv-hK-cQA-Q_zTQzZCMw",
-  submitRequestFunctionUrl: "https://PROJECT_REF.supabase.co/functions/v1/submit-request"
+  submitRequestFunctionUrl: "https://jnpgcbkrttepdtposvhp.supabase.co/functions/v1/submit-request"
 };
