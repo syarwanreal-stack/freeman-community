@@ -53,10 +53,10 @@
             <p>${esc(g.description)}</p>
             ${
               g.link
-                ? `<a class="button-link"
-                     href="${esc(g.link)}"
-                     target="_blank"
-                     rel="noopener noreferrer">Buka grup ↗</a>`
+                ? `<a class="button-link" href="${esc(g.link)}"
+                     target="_blank" rel="noopener noreferrer">
+                     Buka grup ↗
+                   </a>`
                 : '<span class="muted">Link belum tersedia</span>'
             }
           </article>
@@ -81,7 +81,7 @@
     if (error) {
       console.error("Gagal memuat grup:", error);
       list.innerHTML =
-        "<p class='notice'>Gagal memuat grup. Periksa Console atau konfigurasi Supabase.</p>";
+        "<p class='notice'>Gagal memuat grup. Periksa konfigurasi Supabase.</p>";
       return;
     }
 
@@ -107,13 +107,14 @@
       };
 
       if (!payload.name || payload.name.length > 80) {
-        status.textContent = "Nama grup wajib diisi dan maksimal 80 karakter.";
+        status.textContent =
+          "Nama grup wajib diisi dan maksimal 80 karakter.";
         return;
       }
 
       if (!/^https:\/\/chat\.whatsapp\.com\/[A-Za-z0-9]+(?:[/?#].*)?$/.test(payload.link)) {
         status.textContent =
-          "Link harus berupa link undangan WhatsApp yang valid (chat.whatsapp.com).";
+          "Link harus berupa link undangan WhatsApp yang valid.";
         return;
       }
 
@@ -129,14 +130,16 @@
       }
 
       const endpoint = cfg.submitRequestFunctionUrl;
+      const anonKey = cfg.supabaseAnonKey;
 
       if (
         typeof endpoint !== "string" ||
         !endpoint.startsWith("https://") ||
-        endpoint.includes("PROJECT_REF")
+        endpoint.includes("PROJECT_REF") ||
+        !anonKey
       ) {
         status.textContent =
-          "URL Edge Function belum dikonfigurasi dengan benar di config.js.";
+          "Konfigurasi endpoint atau publishable key belum benar di config.js.";
         return;
       }
 
@@ -152,13 +155,14 @@
         const response = await fetch(endpoint, {
           method: "POST",
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${anonKey}`,
+            "apikey": anonKey
           },
           body: JSON.stringify(payload)
         });
 
         const responseText = await response.text();
-
         let data = {};
 
         try {
@@ -181,24 +185,16 @@
           );
         }
 
-        if (data.ok === false) {
-          throw new Error(
-            data.error || "Server belum mengonfirmasi penyimpanan request."
-          );
-        }
-
         status.textContent =
           "Request berhasil dikirim untuk ditinjau admin.";
 
         requestForm.reset();
       } catch (err) {
         console.error("Pengiriman request gagal:", err);
-
         status.textContent =
           "Gagal mengirim: " +
           (err?.message || "Kesalahan tidak diketahui") +
-          ". Periksa Edge Functions di Supabase.";
-
+          ".";
       } finally {
         if (submitButton) submitButton.disabled = false;
       }
