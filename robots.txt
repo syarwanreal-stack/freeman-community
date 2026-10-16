@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://sgroup.syarwanreal.workers.dev/sitemap.xml
